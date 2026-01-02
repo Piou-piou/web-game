@@ -1,0 +1,18 @@
+:80 {
+    # Définir la racine du site (doit correspondre au volume monté dans Caddy)
+    root * /srv/app/public
+
+    # Compresser les réponses (Gzip/Zstd)
+    encode gzip
+
+    # Rediriger toutes les requêtes PHP vers le conteneur PHP-FPM
+    php_fastcgi php:9000
+
+    # Servir les fichiers statiques
+    file_server
+
+    # Logs (optionnel)
+    log {
+        output stdout
+    }
+}

@@ -1,0 +1,100 @@
+services:
+  # --- Service Web (Caddy) ---
+  caddy:
+    image: caddy:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./public:/srv/app/public:ro
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - php
+
+  # --- Application PHP (FPM) ---
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./:/srv/app
+    environment:
+      # Pour Linux, passer votre UID (ex: 1000) si besoin de régler des soucis de permissions
+      # Sur Mac, Docker Desktop gère ça automatiquement.
+      APP_ENV: dev
+      DATABASE_URL: mysql://app:ChangeMe@database:3306/app?serverVersion=mariadb-11.4.0
+    depends_on:
+      - database
+
+  # --- PHP Worker (Messenger) ---
+  worker:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: unless-stopped
+    # Adaptez le nom du transport selon votre config messenger.yaml (ex: async, scheduler, etc.)
+    command: php bin/console messenger:consume async -vv
+    volumes:
+      - ./:/srv/app
+    depends_on:
+      - database
+      - php
+
+  # --- Base de données (MariaDB) ---
+  database:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ChangeMe
+      MYSQL_DATABASE: app
+      MYSQL_USER: app
+      MYSQL_PASSWORD: ChangeMe
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      # Exposé sur le localhost pour accès direct si besoin (optionnel)
+      - "3306:3306"
+
+  # --- GUI Base de données (Adminer) ---
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+
+  # --- PDF Generator (Gotenberg) ---
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    restart: unless-stopped
+    # Gotenberg tourne en tant qu'utilisateur non-root par défaut (UID 1001)
+    ports:
+      - "3000:3000"
+    command:
+      - "gotenberg"
+      - "--api-port=3000"
+      - "--api-timeout=30s"
+      # Charge les moteurs nécessaires (Chromium + LibreOffice)
+      - "--chromium-disable-routes=false"
+      - "--libreoffice-disable-routes=false"
+
+  # --- Email Catching (Mailpit) ---
+  mailpit:
+    image: axllent/mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # Port SMTP
+      - "8025:8025" # Interface Web
+    environment:
+      MP_MAX_MESSAGES: 5000
+
+volumes:
+  caddy_data:
+  caddy_config:
+  db_data:
