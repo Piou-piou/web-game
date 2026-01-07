@@ -44,7 +44,6 @@ services:
       - database
       - php
 
-  # --- Base de données (MariaDB) ---
   database:
     image: mariadb:11.4
     restart: unless-stopped
