@@ -3,15 +3,96 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <link rel="icon"
+              href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         {% block stylesheets %}
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         {% endblock %}
 
         {% block javascripts %}
+            <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
     <body>
+        <header class="fixed top-0 left-0 right-0 z-50 pointer-events-none select-none">
+            <div
+                class="w-full bg-gray-900/95 backdrop-blur-md border-b border-gray-600 shadow-[0_4px_30px_rgba(0,0,0,0.5)] pointer-events-auto relative">
+                <div
+                    class="absolute top-0 left-0 h-0.5 bg-gradient-to-r from-blue-600 via-cyan-400 to-blue-600 w-full opacity-70 shadow-[0_0_10px_rgba(34,211,238,0.8)]"></div>
+                <div class="flex items-center justify-around px-8 py-4 mx-auto max-w-[1920px]">
+
+                    {# 1. ÉNERGIE (Centrale Électrique) #}
+                    <div
+                        class="flex items-center space-x-4 group relative cursor-help transition-transform hover:scale-105"
+                        title="Production énergétique">
+                        <div class="relative">
+                            <i class="fas fa-bolt text-2xl text-yellow-400 drop-shadow-[0_0_12px_rgba(250,204,21,0.8)] group-hover:animate-pulse"></i>
+                            <div
+                                class="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-gray-900"></div>
+                        </div>
+                        <div class="flex flex-col leading-none">
+                            <span class="text-xs text-gray-400 font-bold tracking-widest uppercase mb-1">Énergie</span>
+                            <span
+                                class="text-xl font-mono font-bold text-white tracking-wide shadow-black drop-shadow-md">
+                        12,450
+                    </span>
+                        </div>
+                    </div>
+
+                    <div class="h-10 w-px bg-gradient-to-b from-transparent via-gray-600 to-transparent"></div>
+
+                    {# 2. FER (Mine / Métal) #}
+                    <div class="flex items-center space-x-4 group cursor-help transition-transform hover:scale-105"
+                         title="Stock de Fer">
+                        <div class="relative">
+                            <i class="fas fa-cube text-2xl text-gray-400 drop-shadow-[0_0_8px_rgba(156,163,175,0.6)] group-hover:text-white transition-colors"></i>
+                        </div>
+                        <div class="flex flex-col leading-none">
+                            <span class="text-xs text-gray-500 font-bold tracking-widest uppercase mb-1">Fer</span>
+                            <span class="text-xl font-mono font-bold text-gray-200 shadow-black drop-shadow-md">
+                                850
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="h-10 w-px bg-gradient-to-b from-transparent via-gray-600 to-transparent"></div>
+
+                    {# 3. FUEL (Pétrole / Carburant) #}
+                    <div class="flex items-center space-x-4 group cursor-help transition-transform hover:scale-105"
+                         title="Réserves de Fuel">
+                        <div class="relative">
+                            <i class="fas fa-gas-pump text-2xl text-purple-400 drop-shadow-[0_0_8px_rgba(192,132,252,0.6)]"></i>
+                        </div>
+                        <div class="flex flex-col leading-none">
+                            <span
+                                class="text-xs text-purple-400/70 font-bold tracking-widest uppercase mb-1">Fuel</span>
+                            <span class="text-xl font-mono font-bold text-purple-100 shadow-black drop-shadow-md">
+                        300
+                    </span>
+                        </div>
+                    </div>
+
+                    <div class="h-10 w-px bg-gradient-to-b from-transparent via-gray-600 to-transparent"></div>
+
+                    {# 4. EAU (Centrale à Eau) #}
+                    <div class="flex items-center space-x-4 group cursor-help transition-transform hover:scale-105"
+                         title="Stock d'Eau">
+                        <div class="relative">
+                            <i class="fas fa-tint text-2xl text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.6)] group-hover:rotate-12 transition-transform"></i>
+                        </div>
+                        <div class="flex flex-col leading-none">
+                            <span class="text-xs text-cyan-500/70 font-bold tracking-widest uppercase mb-1">Eau</span>
+                            <span class="text-xl font-mono font-bold text-cyan-100 shadow-black drop-shadow-md">
+                        2,100
+                    </span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </header>
+
         {% block body %}{% endblock %}
     </body>
 </html>

@@ -1,0 +1,177 @@
+{# templates/game/base_map.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion de la Base{% endblock %}
+
+{% block body %}
+
+
+    {# 2. CONTENEUR PRINCIPAL #}
+    <div class="min-h-screen bg-gray-950 text-white font-sans selection:bg-cyan-500 selection:text-black pt-24 pb-12 px-4">
+
+        {# Arrière-plan subtil (fixe) #}
+        <div class="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-30 pointer-events-none"></div>
+        <div class="fixed inset-0 bg-gradient-to-b from-gray-900 via-gray-900 to-black -z-10"></div>
+
+        <div class="max-w-6xl mx-auto space-y-8 relative z-10">
+
+            {# --- SECTION A : CENTRE DE COMMANDEMENT (QG) --- #}
+            <div class="bg-gray-900/80 backdrop-blur border border-blue-900/50 rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(30,58,138,0.2)]">
+                <div class="md:flex">
+                    {# Visuel QG #}
+                    <div class="md:w-1/3 bg-gradient-to-br from-blue-900/40 to-slate-900 p-8 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-blue-900/30 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors"></div>
+                        <i class="fas fa-chess-king text-6xl text-blue-400 mb-4 drop-shadow-[0_0_15px_rgba(96,165,250,0.6)]"></i>
+                        <h2 class="text-2xl font-bold text-white tracking-wider uppercase">Quartier Général</h2>
+                        <span class="mt-2 px-3 py-1 bg-blue-900/50 border border-blue-500/30 rounded text-xs font-mono text-blue-300">Niveau 5</span>
+                    </div>
+
+                    {# Stats & Actions QG #}
+                    <div class="md:w-2/3 p-6 md:p-8 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-gray-400 text-sm font-bold uppercase mb-4 tracking-widest border-b border-gray-800 pb-2">Résumé de la Base</h3>
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <span class="block text-gray-500 text-xs mb-1">Capacité de Stockage</span>
+                                    <div class="text-xl font-mono text-white">50,000 <span class="text-sm text-gray-600">unités</span></div>
+                                </div>
+                                <div>
+                                    <span class="block text-gray-500 text-xs mb-1">Défense Globale</span>
+                                    <div class="text-xl font-mono text-white">1,200 <span class="text-sm text-gray-600">pts</span></div>
+                                </div>
+                                <div>
+                                    <span class="block text-gray-500 text-xs mb-1">Production Totale</span>
+                                    <div class="text-xl font-mono text-green-400">+3,450 <span class="text-sm text-gray-600">/h</span></div>
+                                </div>
+                                <div>
+                                    <span class="block text-gray-500 text-xs mb-1">Énergie Consommée</span>
+                                    <div class="text-xl font-mono text-yellow-500">450 <span class="text-sm text-gray-600">/ 1200</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex justify-end">
+                            <button class="px-6 py-2 bg-blue-700 hover:bg-blue-600 text-white font-bold rounded border border-blue-500 shadow-lg shadow-blue-900/50 transition-all transform hover:scale-105 flex items-center">
+                                <i class="fas fa-arrow-circle-up mr-2"></i> Gérer le QG
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# --- SECTION B : BÂTIMENTS DE PRODUCTION (Grille) --- #}
+
+            <div class="flex items-center justify-between border-b border-gray-800 pb-2 mb-6">
+                <h3 class="text-xl font-bold text-gray-300 flex items-center">
+                    <i class="fas fa-industry mr-3 text-gray-500"></i> Infrastructures
+                </h3>
+                {# Calcul simple des slots utilisés pour l'affichage #}
+                <span class="text-sm text-gray-500 font-mono">Slots: 3/5 Utilisés</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                {# Données simulées #}
+                {% set slots = [
+                    { id: 1, type: 'electric', level: 12 },
+
+                    { id: 3, type: 'iron', level: 8 },
+                    { id: 4, type: 'fuel', level: 5 },
+                    { id: 5, type: 'water', level: 3 }
+                ] %}
+
+                {# BOUCLE 1 : LES BÂTIMENTS CONSTRUITS #}
+                {% for slot in slots %}
+                    {# Styles par type #}
+                    {% set styles = {
+                        'electric': { color: 'yellow', icon: 'fa-bolt', name: 'Centrale Élec.', prod_unit: 'kW' },
+                        'iron': { color: 'gray', icon: 'fa-cube', name: 'Mine de Fer', prod_unit: 'Fer' },
+                        'fuel': { color: 'purple', icon: 'fa-gas-pump', name: 'Raffinerie Fuel', prod_unit: 'L' },
+                        'water': { color: 'cyan', icon: 'fa-tint', name: 'Pompe à Eau', prod_unit: 'L' }
+                    } %}
+                    {% set s = styles[slot.type] %}
+
+                    <div class="relative bg-gray-800 border border-gray-700 rounded-xl overflow-hidden hover:border-{{ s.color }}-500/50 hover:shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all group"
+                         data-controller="map-interaction"
+                         data-action="click->map-interaction#selectSlot"
+                         data-slot-id="{{ slot.id }}"
+                         data-slot-type="{{ slot.type }}">
+
+                        {# Barre de Status (Haut) #}
+                        <div class="bg-gray-900/50 p-4 flex justify-between items-start border-b border-gray-700">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded bg-gray-800 border border-gray-600 flex items-center justify-center text-{{ s.color }}-400">
+                                    <i class="fas {{ s.icon }} text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-200 leading-tight">{{ s.name }}</h4>
+                                    <span class="text-xs text-gray-500 font-mono">Niveau {{ slot.level }}</span>
+                                </div>
+                            </div>
+
+                            {# Toujours Actif #}
+                            <div class="flex items-center space-x-1 bg-green-900/30 px-2 py-0.5 rounded border border-green-500/20">
+                                <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                                <span class="text-[10px] text-green-400 font-bold uppercase">Actif</span>
+                            </div>
+                        </div>
+
+                        {# Corps (Stats) #}
+                        <div class="p-5 space-y-4">
+                            <div class="flex justify-between items-end">
+                                <span class="text-xs text-gray-500 uppercase font-bold">Production</span>
+                                <div class="text-right">
+                                    <span class="text-xl font-mono text-white font-bold block">+{{ slot.level * 125 }}</span>
+                                    <span class="text-[10px] text-gray-400">{{ s.prod_unit }} / heure</span>
+                                </div>
+                            </div>
+
+                            {# Barre de progression UNIFIÉE #}
+                            {# Couleur fixe (Dégradé vert) et animation récurrente pour tous #}
+                            <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden relative">
+                                {# La largeur est fixée à 60% pour l'exemple, ou dynamique selon le cycle de prod #}
+                                <div class="h-full bg-gradient-to-r from-emerald-600 to-green-400 w-10/10 relative overflow-hidden">
+                                    {# Animation de brillance infinie #}
+                                    <div class="absolute inset-0 bg-white/40 w-full -translate-x-full animate-[shimmer_2s_infinite_linear]"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Footer (Actions) #}
+                        <div class="bg-gray-900 p-3 flex justify-between items-center border-t border-gray-800">
+                            <span class="text-[10px] text-gray-500">Amélioration: <span class="text-gray-300 font-mono">500 Fer</span></span>
+                            <button class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold rounded transition-colors flex items-center">
+                                <i class="fas fa-wrench mr-1.5"></i> Détails
+                            </button>
+                        </div>
+
+                        {# Glow au survol #}
+                        <div class="absolute inset-0 pointer-events-none border-2 border-transparent group-hover:border-{{ s.color }}-500/30 rounded-xl transition-all"></div>
+                    </div>
+                {% else %}
+
+                {% endfor %}
+                <div class="group relative bg-gray-900/40 border-2 border-dashed border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center min-h-[200px] hover:border-yellow-500/50 hover:bg-gray-900/60 transition-all cursor-pointer"
+                     data-controller="map-interaction"
+                     data-action="click->map-interaction#selectSlot"
+                     data-slot-id="2"
+                     data-slot-type="empty">
+
+                    <div class="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center mb-4 group-hover:bg-yellow-500/20 group-hover:text-yellow-400 transition-colors">
+                        <i class="fas fa-plus text-2xl text-gray-600 group-hover:text-yellow-400"></i>
+                    </div>
+                    <span class="text-gray-500 font-bold uppercase tracking-wider text-sm group-hover:text-yellow-500">Emplacement Libre</span>
+                    <span class="text-xs text-gray-600 mt-1">Cliquez pour construire</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <style>
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+{% endblock %}
